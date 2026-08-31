@@ -1,0 +1,48 @@
+# Snapshot of the local dev cassandra-market Podman container, captured via
+# `podman generate kube cassandra-market` on 2026-08-05 — starting point for
+# the "Docker images for backend & frontend" / k8s hosting item in
+# PHASE4_DEPLOYMENT_CONFIGURATION.md, not a deployable manifest as-is: the
+# PersistentVolumeClaim below (cassandra-market-data) has no matching
+# PVC/StorageClass definition yet.
+#
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-6.0.2
+
+# NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
+# enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
+# has the right permissions to access the volumes added.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2026-08-05T02:07:41Z"
+  labels:
+    app: cassandra-market-pod
+  name: cassandra-market-pod
+spec:
+  containers:
+  - args:
+    - cassandra
+    - -f
+    env:
+    - name: CASSANDRA_CLUSTER_NAME
+      value: herrrickshaw
+    - name: CASSANDRA_DC
+      value: datacenter1
+    image: docker.io/library/cassandra:4.1
+    name: cassandra-market
+    ports:
+    - containerPort: 7199
+      hostPort: 7199
+    - containerPort: 9042
+      hostPort: 9042
+    volumeMounts:
+    - mountPath: /var/lib/cassandra
+      name: cassandra-market-data-pvc
+  volumes:
+  - name: cassandra-market-data-pvc
+    persistentVolumeClaim:
+      claimName: cassandra-market-data
+
